@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo · Pirámide DuPont-CAMEL (Synthetic Data)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy-950:#0A1E38; --navy-900:#0F2A4A; --navy-800:#16385E; --navy-700:#20487A;
+    --gold-500:#C7963B; --gold-300:#E4C179;
+    --purple:#5B3A8E; --purple-bg:#F1ECF8;
+    --blue:#1F5FA8; --blue-bg:#EAF1FB;
+    --green:#1D7A5E; --green-bg:#E4F3EC;
+    --orange:#B0752E; --orange-bg:#FBF0E2;
+    --teal:#1A7A82; --teal-bg:#E5F3F4;
+    --paper:#F4F5F8; --paper-card:#FFFFFF;
+    --ink:#101826; --ink-soft:#5B667A; --ink-faint:#8A93A6;
+    --line:#E4E7EE;
+    --good:#1D7A5E; --good-bg:#E4F3EC;
+    --warn:#B07B1D; --warn-bg:#FAF1DE;
+    --bad:#B23A3A; --bad-bg:#FBE9E9;
+    --neutral:#5B667A; --neutral-bg:#EEF0F4;
+    --shadow: 0 1px 2px rgba(15,42,74,0.06), 0 8px 24px -12px rgba(15,42,74,0.18);
+    --shadow-lg: 0 4px 10px rgba(15,42,74,0.08), 0 20px 44px -16px rgba(15,42,74,0.28);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{ background:var(--paper); color:var(--ink); font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  .num{ font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; }
+  h1,h2,h3,h4{ font-family:'Space Grotesk',sans-serif; }
+
+  header{
+    background: linear-gradient(155deg, var(--navy-950) 0%, var(--navy-800) 65%, var(--navy-700) 100%);
+    color:#fff; padding:24px clamp(16px,4vw,48px) 20px; position:relative; overflow:hidden;
+  }
+  header::after{ content:""; position:absolute; right:-8%; top:-70%; width:480px; height:480px; border-radius:50%;
+    background: radial-gradient(circle, rgba(199,150,59,0.20) 0%, rgba(199,150,59,0) 70%); }
+  .eyebrow{ display:flex; align-items:center; gap:10px; font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold-300); font-weight:600; margin-bottom:8px; }
+  .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:var(--gold-300); }
+  header h1{ margin:0 0 6px; font-size:clamp(20px,3vw,27px); font-weight:700; letter-spacing:-0.01em; }
+  header p.sub{ margin:0; color:#C7D2E3; font-size:12.5px; max-width:780px; line-height:1.5; }
+
+  main{ max-width:1300px; margin:0 auto; padding: 28px clamp(16px,4vw,48px) 60px; }
+
+  /* ===== Pyramid ===== */
+  .pyramid-wrap{ position:relative; padding:10px 0 6px; }
+  .boxes-row{ display:flex; align-items:stretch; justify-content:center; gap:10px; flex-wrap:wrap; }
+
+  .pbox{
+    background:var(--paper-card); border:1.5px solid var(--line); border-radius:14px;
+    padding:14px 16px; min-width:170px; max-width:230px; flex:1 1 170px;
+    box-shadow:var(--shadow); cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    text-align:center; position:relative;
+  }
+  .pbox:hover{ transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+  .pbox.selected{ border-color:var(--gold-500); box-shadow:0 0 0 2px var(--gold-500), var(--shadow-lg); }
+  .pbox .title{ font-size:13px; font-weight:700; color:var(--ink); margin-bottom:2px; }
+  .pbox .value{ font-size:22px; font-weight:700; color:var(--navy-900); line-height:1; margin-bottom:6px; }
+
+  /* Detail Panel */
+  .detail-anchor{ margin-top:26px; }
+  .detail-placeholder{ text-align:center; padding:50px 20px; color:var(--ink-faint); font-size:13px; background:var(--paper-card); border:1px dashed var(--line); border-radius:16px; }
+  
+  footer{ text-align:center; padding:20px 16px 36px; font-size:10.5px; color:var(--ink-faint); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow"><span class="dot"></span>Modelo Demo DuPont-CAMEL (Datos Sintéticos)</div>
+  <h1>De los Indicadores de Desempeño a la Rentabilidad (ROE)</h1>
+  <p class="sub">Demostración técnica de maquetación interactiva, componentes CSS y visualización de datos en frontend.</p>
+</header>
+
+<main>
+  <div class="pyramid-wrap" id="pyramid">
+    <div class="boxes-row">
+      <div class="pbox">
+        <div class="title">Capital (C)</div>
+        <div class="value num">15.5%</div>
+      </div>
+      <div class="pbox">
+        <div class="title">Activos (A)</div>
+        <div class="value num">3.2%</div>
+      </div>
+      <div class="pbox">
+        <div class="title">Management (M)</div>
+        <div class="value num">52.1%</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="detail-anchor" id="detail-anchor">
+    <div class="detail-placeholder">Selecciona cualquier componente para previsualizar los detalles interactivos.</div>
+  </div>
+</main>
+
+<footer>Demostración de interfaz de usuario con datos simulados y anonimizados · Repositorio público con fines educativos y de portafolio técnico.</footer>
+
+<!-- PAYLOAD CON DATOS ANÓNIMOS Y SIMULADOS -->
+<script type="application/json" id="camel-payload">
+{
+  "month_labels": ["Ene-26", "Feb-26", "Mar-26", "Abr-26", "May-26", "Jun-26"],
+  "real_months_count": 6,
+  "camel": [
+    {
+      "code": "C",
+      "nombre": "Capital",
+      "subtitulo": "Solvencia y apalancamiento sintético",
+      "color": "#2E5395",
+      "grupos": [
+        {
+          "grupo": "Estructura de Capital Demo",
+          "indicadores": [
+            {
+              "nombre": "Indicador A (Demo)",
+              "dimension": "C",
+              "unidad": "%",
+              "formula": "Variable X / Variable Y × 100",
+              "actual": 0.1500,
+              "meta": 0.1450,
+              "ultimo_mes_real": "Jun-26",
+              "months_ejec": [0.141, 0.143, 0.145, 0.148, 0.149, 0.150],
+              "months_meta": [0.140, 0.141, 0.142, 0.143, 0.144, 0.145],
+              "explicacion": "Métrica de prueba genérica para la validación de la interfaz gráfica y flujo de navegación.",
+              "explicacion_mes": "Comportamiento simulado sin relación con registros contables reales."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+</script>
+
+</body>
+</html>
